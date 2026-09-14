@@ -1,11 +1,17 @@
 import pyttsx3
+import sounddevice as sd
+from scipy.io.wavfile import write
 import speech_recognition as sr
+import os
 
 class VoiceEngine:
     def __init__(self):
         self.engine = pyttsx3.init()
         self.recognizer = sr.Recognizer()
+        self.sample_rate = 44100  
+        self.record_seconds = 5  
         
+        # Setup AI Voice
         voices = self.engine.getProperty('voices')
         if voices:
             self.engine.setProperty('voice', voices[0].id) 
@@ -17,17 +23,34 @@ class VoiceEngine:
         self.engine.runAndWait()
 
     def listen(self):
-        with sr.Microphone() as source:
-            print("Listening...")
-            self.recognizer.adjust_for_ambient_noise(source)
-            try:
-                audio = self.recognizer.listen(source, timeout=5, phrase_time_limit=10)
-                command = self.recognizer.recognize_google(audio)
+        print("\n[Microphone Active] Listening for 5 seconds...")
+        temp_file = "jarvis_temp_voice.wav"
+        
+        try:
+            # 1. Capture audio via sounddevice instead of pyaudio
+            recording = sd.rec(int(self.record_seconds * self.sample_rate), 
+                               samplerate=self.sample_rate, 
+                               channels=1, 
+                               dtype='int16')
+            sd.wait()  
+            
+            # 2. Save it temporarily
+            write(temp_file, self.sample_rate, recording)
+            
+            # 3. Read and translate the voice file
+            with sr.AudioFile(temp_file) as source:
+                audio_data = self.recognizer.record(source)
+                command = self.recognizer.recognize_google(audio_data)
                 print(f"You: {command}")
-                return command
-            except sr.UnknownValueError:
-                return ""
-            except sr.RequestError:
-                return "Speech recognition service offline."
-            except Exception:
-                return ""
+                
+            # Clean up the temp file
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
+                
+            return command
+            
+        except sr.UnknownValueError:
+            return ""
+        except Exception as e:
+            print(f"[Voice Error]: {e}")
+            return ""

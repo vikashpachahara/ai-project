@@ -3,7 +3,8 @@ pyautogui
 psutil
 SpeechRecognition
 edge-tts
-pyaudio
+sounddevice
+scipy
 pillow
 pygame-ce
 duckduckgo-search

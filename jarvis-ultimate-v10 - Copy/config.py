@@ -4,7 +4,7 @@ class Config:
     # API Keys
     # We pull from environment variables to keep keys secure. 
     # (Set this in Windows: setx GEMINI_API_KEY "your_key_here")
-    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "enter api key")
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "enter your api")
     
     # Model Settings
     # Utilizing gemini-2.0-flash as the core brain for rapid multimodal reasoning
