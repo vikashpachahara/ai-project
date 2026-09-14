@@ -1,0 +1,12 @@
+google-genai
+pyautogui
+psutil
+SpeechRecognition
+edge-tts
+sounddevice
+scipy
+pillow
+pygame-ce
+duckduckgo-search
+playwright
+opencv-python
